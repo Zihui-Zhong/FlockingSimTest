@@ -72,7 +72,9 @@ namespace BreakingOut
                 {
                     if (i == rangee-1 && j == colones-1)
                     {
+                        tempTexture = Content.Load<Texture2D>("Disaster");
                         obs[count] = new ControlledCube(tempTexture, new Vector2(100 + screenRectangle.Width / rangee * i, 100 + screenRectangle.Height / colones * j));
+                        tempTexture = Content.Load<Texture2D>("Circle");
                     }
                     else
                     {
