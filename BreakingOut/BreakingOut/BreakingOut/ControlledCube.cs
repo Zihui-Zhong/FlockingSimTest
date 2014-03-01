@@ -15,9 +15,9 @@ namespace BreakingOut
         {
 
         }
-        public override Vector2 Collide(Bloid bloid)
+        public override Vector2 Fear(Bloid bloid)
         {
-            Vector2 d = bloid.getLocation() - position;
+            Vector2 d = bloid.getPosition() - position;
             float dis = d.Length();
             if (dis < rayon*3)
             {

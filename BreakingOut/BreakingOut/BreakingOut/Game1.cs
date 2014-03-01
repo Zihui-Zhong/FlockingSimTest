@@ -21,13 +21,15 @@ namespace BreakingOut
         Rectangle screenRectangle;
         Bloid[] bloids;
         Obstacle[] obs;
+        int alive;
+        SpriteFont font;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = 1500;
-            graphics.PreferredBackBufferHeight = 750;
+            graphics.PreferredBackBufferWidth = 1700;
+            graphics.PreferredBackBufferHeight = 1000;
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
         }
 
@@ -53,36 +55,37 @@ namespace BreakingOut
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Texture2D tempTexture = Content.Load<Texture2D>("ball");
-            int a = 300;
+            int a = 400;
+            alive = a;
             bloids = new Bloid[a];
             Random random = new Random();
             for (int i = 0; i < a; i++)
             {
-                bloids[i] = new Bloid((float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1,tempTexture,screenRectangle);
+                bloids[i] = new Bloid((float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1, tempTexture, screenRectangle);
             }
-            tempTexture= Content.Load<Texture2D>("Circle");
-            int rangee = 10;
-            int colones = 5;
-            float scale =0.5f;
-            obs = new Obstacle[rangee*colones];
-            int count=0;
+            int rangee = 6;
+            int colones = 8;
+
+            font = Content.Load<SpriteFont>("myFont");
+
+            obs = new Obstacle[rangee * colones + 1];
+            int count = 0;
+            tempTexture = Content.Load<Texture2D>("Disaster");
+            obs[count] = new ControlledCube(tempTexture, new Vector2(screenRectangle.Width / rangee , screenRectangle.Height / colones ));
+            tempTexture = Content.Load<Texture2D>("CityBlock");
+            count++;
             for (int i = 0; i < rangee; i++)
             {
                 for (int j = 0; j < colones; j++)
                 {
-                    if (i == rangee-1 && j == colones-1)
-                    {
-                        tempTexture = Content.Load<Texture2D>("Disaster");
-                        obs[count] = new ControlledCube(tempTexture, new Vector2(100 + screenRectangle.Width / rangee * i, 100 + screenRectangle.Height / colones * j));
-                        tempTexture = Content.Load<Texture2D>("Circle");
-                    }
-                    else
-                    {
-                        obs[count] = new Obstacle(tempTexture, new Vector2(100 + screenRectangle.Width / rangee * i, 100 + screenRectangle.Height / colones * j));
-                    }
+
+
+                    obs[count] = new CityBlocks(tempTexture, new Vector2(screenRectangle.Width / rangee * i, screenRectangle.Height / colones * j));
+
                     count++;
                 }
             }
+
             StartGame();
         }
         private void StartGame()
@@ -106,19 +109,24 @@ namespace BreakingOut
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            alive = 0;
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
             foreach (Bloid bloid in bloids)
             {
-                if(bloid.isAlive())
-                   bloid.updateAcceleration(bloids,obs);
+                if (bloid.isAlive())
+                {
+                    bloid.updateAcceleration(bloids, obs);
+                    alive++;
+                }
+
             }
             foreach (Bloid bloid in bloids)
             {
                 if (bloid.isAlive())
-                    bloid.updateSpeed();
+                    bloid.updateSpeed(obs);
             }
             foreach (Bloid bloid in bloids)
             {
@@ -133,7 +141,7 @@ namespace BreakingOut
             {
                 o.update();
             }
-            
+
         }
 
         /// <summary>
@@ -142,6 +150,7 @@ namespace BreakingOut
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+
             GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
@@ -149,13 +158,26 @@ namespace BreakingOut
             {
                 o.Draw(spriteBatch);
             }
-            foreach(Bloid bloid in bloids)
+            foreach (Bloid bloid in bloids)
             {
                 bloid.Draw(spriteBatch);
             }
 
-            
+            spriteBatch.DrawString(font, gameTime.ElapsedGameTime + "", new Vector2(10, 10), Color.Red);
+            spriteBatch.DrawString(font, alive + "", new Vector2(10, 30), Color.Red);
+
+
+            obs[0].Draw(spriteBatch);
+
+
+
+
             spriteBatch.End();
+
+
+
+
+
 
             base.Draw(gameTime);
         }

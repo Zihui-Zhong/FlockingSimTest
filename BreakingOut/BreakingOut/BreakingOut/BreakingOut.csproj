@@ -110,6 +110,7 @@
     <Compile Include="Ball.cs" />
     <Compile Include="Bloid.cs" />
     <Compile Include="Brick.cs" />
+    <Compile Include="CityBlocks.cs" />
     <Compile Include="ControlledCube.cs" />
     <Compile Include="Obstacle.cs" />
     <Compile Include="Paddle.cs" />

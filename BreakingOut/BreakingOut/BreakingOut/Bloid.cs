@@ -18,14 +18,14 @@ namespace BreakingOut
         double alignementRange;
         double separationRange;
         double avoidRange;
-        double collisionRange;
+        double fearRange;
         float maxSpeed;
         Texture2D texture;
         float alignementWeight;
         float separationWeight;
         float cohesionWeight;
         float avoidWeight;
-        float collisionWeight;
+        float fearWeight;
         Rectangle screenRegion;
 
         bool alive;
@@ -38,17 +38,17 @@ namespace BreakingOut
             screenRegion = c;
             position = new Vector2(c.Width / 2 - 25, c.Height / 2 - 25);
             motion = new Vector2(x, y);
-            alignementRange = 100;
-            separationRange = 10;
-            cohesionRange = 100;
-            avoidRange = 100;
-            collisionRange = 5;
-            maxSpeed = 0.5f;
+            alignementRange = 100*100;
+            separationRange = 10*10;
+            cohesionRange = 100*100;
+            avoidRange = 100*100;
+            fearRange = 5;
+            maxSpeed = 0.5f*0.5f;
             alignementWeight = 0.01f * maxSpeed;
-            avoidWeight = 0.03f * maxSpeed;
+            avoidWeight = 0.06f * maxSpeed;
             separationWeight = 0.08f * maxSpeed;
             cohesionWeight = 0.0001f * maxSpeed;
-            collisionWeight = 0.1f * maxSpeed;
+            fearWeight = 0.1f * maxSpeed;
             alive = true;
 
         }
@@ -62,7 +62,7 @@ namespace BreakingOut
             Vector2 a = Alignement(neighbours);
             Vector2 s = Separation(neighbours);
             Vector2 v = Avoid(o);
-            Vector2 l = Collision(o);
+            Vector2 l = Fear(o);
             c.X *= cohesionWeight;
             c.Y *= cohesionWeight;
             a.X *= alignementWeight;
@@ -71,24 +71,32 @@ namespace BreakingOut
             s.Y *= separationWeight;
             v.X *= avoidWeight;
             v.Y *= avoidWeight;
-            l.X *= collisionWeight;
-            l.Y *= collisionWeight;
+            l.X *= fearWeight;
+            l.Y *= fearWeight;
             acceleration = new Vector2(0, 0);
             acceleration += c;
             acceleration += s;
             acceleration += a;
             acceleration += v;
             acceleration += l;
+
+
+
         }
-        public void updateSpeed()
+        public void updateSpeed(Obstacle[] o)
         {
             motion += acceleration;
-            if (motion.Length() > maxSpeed)
+            foreach (Obstacle obs in o)
+            {
+                obs.Collide(this);
+            }
+            if (motion.X*motion.X+motion.Y*motion.Y > maxSpeed)
             {
                 motion.Normalize();
                 motion.X *= maxSpeed;
                 motion.Y *= maxSpeed;
             }
+ 
         }
         public void updatePosition()
         {
@@ -137,13 +145,13 @@ namespace BreakingOut
             return sum;
 
         }
-        public Vector2 Collision(Obstacle[] o)
+        public Vector2 Fear(Obstacle[] o)
         {
             int count = 0;
             Vector2 sum = new Vector2(0, 0);
             foreach (Obstacle obs in o)
             {
-                Vector2 d = obs.Collide(this);
+                Vector2 d = obs.Fear(this);
 
                 if(d.X!=0&&d.Y!=0){
                     sum += d;
@@ -155,7 +163,6 @@ namespace BreakingOut
             {
                 sum.X /= count;
                 sum.Y /= count;
-                sum.Normalize();
             }
 
             return sum;
@@ -168,8 +175,8 @@ namespace BreakingOut
             {
                 if (bloid.isAlive())
                 {
-                    Vector2 d = bloid.getLocation() - position;
-                    if ((d).Length() < cohesionRange)
+                    Vector2 d = bloid.getPosition() - position;
+                    if ((d).X*d.X+d.Y*d.Y < cohesionRange)
                     {
                         sum += d;
                         count++;
@@ -196,7 +203,8 @@ namespace BreakingOut
             {
                 if (bloid.isAlive())
                 {
-                    if ((bloid.getLocation() - position).Length() < alignementRange)
+                    Vector2 d=(bloid.getPosition() - position);
+                    if ((d).X*d.X+d.Y*d.Y< alignementRange)
                     {
                         sum += bloid.getMotion();
                         count++;
@@ -223,11 +231,11 @@ namespace BreakingOut
             {
                 if (bloid.isAlive())
                 {
-                    Vector2 d = new Vector2(position.X - bloid.getLocation().X, position.Y - bloid.getLocation().Y);
-                    float dis = d.Length();
+                    Vector2 d = new Vector2(position.X - bloid.getPosition().X, position.Y - bloid.getPosition().Y);
+                    float dis = (d).X * d.X + d.Y * d.Y;
                     if (dis > 0 && dis < separationRange)
                     {
-
+                        dis = (float) Math.Sqrt(dis);
                         sum.X += d.X / dis;
                         sum.Y += d.Y / dis;
                         count++;
@@ -246,25 +254,9 @@ namespace BreakingOut
             }
             return sum;
         }
-        public Vector2 Coh2dsesion(Bloid[] neighbours)
-        {
-            Vector2 sum = new Vector2(0, 0);
-            int count = 0;
-            foreach (Bloid bloid in neighbours)
-            {
-                if ((bloid.getLocation() - position).Length() < cohesionRange)
-                {
-                    sum += bloid.getLocation();
-                    count++;
-                }
-            }
-            sum.X = sum.X / count;
-            sum.Y = sum.Y / count;
-            return sum;
-        }
 
 
-        public Vector2 getLocation()
+        public Vector2 getPosition()
         {
             return position;
         }
@@ -279,7 +271,7 @@ namespace BreakingOut
         }
         public double getCollisionRange()
         {
-            return collisionRange;
+            return fearRange;
         }
         public void kill()
         {
@@ -288,6 +280,10 @@ namespace BreakingOut
         public bool isAlive()
         {
             return alive;
+        }
+        public void setMotion(Vector2 m)
+        {
+            motion = m;
         }
     }
 

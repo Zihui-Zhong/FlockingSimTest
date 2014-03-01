@@ -42,10 +42,10 @@ namespace BreakingOut
             return rayon;
 
         }
-        public Vector2 Avoid(Bloid bloid){
-            float a = bloid.getMotion().Y;
+        public virtual Vector2 Avoid(Bloid bloid){
+        /*    float a = bloid.getMotion().Y;
             float b = -bloid.getMotion().X;
-            float c = a * bloid.getLocation().X + b * bloid.getLocation().Y;
+            float c = a * bloid.getPosition().X + b * bloid.getPosition().Y;
             float d = -b;
             float e = a;
             float f = d * position.X + e * position.Y;
@@ -55,7 +55,9 @@ namespace BreakingOut
             collision -= position;
 
             Vector2 z = new Vector2(0, 0);
-            if ((position - position).Length() < bloid.getAvoidRange() && (collision).Length() < rayon + 2 && (x - position.X) / bloid.getMotion().X > 0 && (y - position.Y) / bloid.getMotion().Y > 0)
+
+            Vector2 i = position - bloid.getPosition();
+            if ((i).X * i.X + i.Y * i.Y < bloid.getAvoidRange() && (collision).X*collision.X+collision.Y*collision.Y< rayon*rayon + 2 && (x - position.X) / bloid.getMotion().X > 0 && (y - position.Y) / bloid.getMotion().Y > 0)
             {
 
                 if ((collision.Y - position.Y) / (-d) > 0 && (collision.X - position.X) / (e) > 0)
@@ -70,28 +72,30 @@ namespace BreakingOut
                 z.Normalize();
 
             }
-            return z;
+            return z;*/
+            return new Vector2(0, 0);
         }
-        public virtual Vector2 Collide(Bloid bloid)
+        public virtual Vector2 Fear(Bloid bloid)
         {
-            Vector2 d = bloid.getLocation() - position;
-            float dis = d.Length();
-            if (dis < rayon + bloid.getCollisionRange())
-            {
-
-
-                d.X += d.X / dis;
-                d.Y += d.Y / dis;
-
-            }
-            else
-            {
-                d = new Vector2(0, 0);
-            }
-            return d;
+            return new Vector2(0, 0);
         }
         public virtual void update()
         {
+        }
+
+        public virtual void Collide(Bloid bloid)
+        {
+            Vector2 d = position-(bloid.getPosition() + bloid.getMotion());
+            double dis = d.X * d.X + d.Y * d.Y;
+            if (dis < rayon * rayon + 10)
+            {
+
+                double j = (d.Y * bloid.getMotion().Y + d.X * bloid.getMotion().X) / (d.X * d.X + d.Y * d.Y);
+                if(j>0)
+                    bloid.setMotion(bloid.getMotion()-(new Vector2((float)j*d.X,(float)j*d.Y)));
+
+            }
+
         }
     }
 }
