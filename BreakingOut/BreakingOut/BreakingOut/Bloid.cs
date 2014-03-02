@@ -38,10 +38,10 @@ namespace BreakingOut
             screenRegion = c;
             position = new Vector2(x,y);
             motion = new Vector2(dx, dy);
-            alignementRange = 100*100;
+            alignementRange = 50*50;
             separationRange = 13*13;
-            cohesionRange = 100*100;
-            avoidRange = 100*100;
+            cohesionRange = 50*50;
+            avoidRange = 50*50;
             fearRange = 5;
             maxSpeed = 0.5f*0.5f;
             alignementWeight = 0.01f * maxSpeed;

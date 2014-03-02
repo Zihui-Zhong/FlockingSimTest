@@ -31,8 +31,8 @@ namespace BreakingOut
             graphics.PreferredBackBufferWidth = 1500;
             graphics.PreferredBackBufferHeight = 1000;
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
-            rows = graphics.PreferredBackBufferHeight / 100;
-            columbs = graphics.PreferredBackBufferWidth / 100;
+            rows = graphics.PreferredBackBufferHeight / 50;
+            columbs = graphics.PreferredBackBufferWidth / 50;
             bloids = new List<Bloid>[columbs, rows];
             for (int i = 0; i < columbs; i++)
                 for (int j = 0; j < rows; j++)
@@ -67,7 +67,7 @@ namespace BreakingOut
 
             Texture2D tempTexture = Content.Load<Texture2D>("ball");
             int count = 0;
-            int a = 1000;
+            int a = 1400;
             int rangee = 5;
             int colones = 7;
 
@@ -80,7 +80,7 @@ namespace BreakingOut
             {
                 for (int i = 0; i < a/5; i++)
                 {
-                    temp.Add(new Bloid(screenRectangle.Width / rangee * j-25,2*i, (float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1, tempTexture, screenRectangle));
+                    temp.Add(new Bloid(screenRectangle.Width / rangee * j-25,3*i+100, (float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1, tempTexture, screenRectangle));
                     count++;
                 }
             }
@@ -111,7 +111,7 @@ namespace BreakingOut
         {
             foreach (Bloid bloid in l)
             {
-                bloids[(int)bloid.getPosition().X / 100, (int)bloid.getPosition().Y / 100].Add(bloid);
+                bloids[(int)bloid.getPosition().X / 50, (int)bloid.getPosition().Y / 50].Add(bloid);
             }
         }
         private void StartGame()
