@@ -19,18 +19,24 @@ namespace BreakingOut
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Rectangle screenRectangle;
-        Bloid[] bloids;
         Obstacle[] obs;
         int alive;
         SpriteFont font;
-
+        List<Bloid>[,] bloids;
+        int rows, columbs;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = 1700;
+            graphics.PreferredBackBufferWidth = 1500;
             graphics.PreferredBackBufferHeight = 1000;
             screenRectangle = new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight);
+            rows = graphics.PreferredBackBufferHeight / 100;
+            columbs = graphics.PreferredBackBufferWidth / 100;
+            bloids = new List<Bloid>[columbs, rows];
+            for (int i = 0; i < columbs; i++)
+                for (int j = 0; j < rows; j++)
+                    bloids[i, j] = new List<Bloid>();
         }
 
         /// <summary>
@@ -54,24 +60,37 @@ namespace BreakingOut
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            Texture2D tempTexture = Content.Load<Texture2D>("ball");
-            int a = 400;
-            alive = a;
-            bloids = new Bloid[a];
-            Random random = new Random();
-            for (int i = 0; i < a; i++)
-            {
-                bloids[i] = new Bloid((float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1, tempTexture, screenRectangle);
-            }
-            int rangee = 6;
-            int colones = 8;
 
+
+
+
+
+            Texture2D tempTexture = Content.Load<Texture2D>("ball");
+            int count = 0;
+            int a = 1000;
+            int rangee = 5;
+            int colones = 7;
+
+
+            alive = a;
+            List<Bloid> temp = new List<Bloid>();
+            Random random = new Random();
+            ;
+            for (int j = 1; j < 6; j++)
+            {
+                for (int i = 0; i < a/5; i++)
+                {
+                    temp.Add(new Bloid(screenRectangle.Width / rangee * j-25,2*i, (float)random.NextDouble() * 2 - 1, (float)random.NextDouble() * 2 - 1, tempTexture, screenRectangle));
+                    count++;
+                }
+            }
+            Sort(temp);
             font = Content.Load<SpriteFont>("myFont");
 
             obs = new Obstacle[rangee * colones + 1];
-            int count = 0;
+            count = 0;
             tempTexture = Content.Load<Texture2D>("Disaster");
-            obs[count] = new ControlledCube(tempTexture, new Vector2(screenRectangle.Width / rangee , screenRectangle.Height / colones ));
+            obs[count] = new ControlledCube(tempTexture, new Vector2(0, 0));
             tempTexture = Content.Load<Texture2D>("CityBlock");
             count++;
             for (int i = 0; i < rangee; i++)
@@ -80,13 +99,20 @@ namespace BreakingOut
                 {
 
 
-                    obs[count] = new CityBlocks(tempTexture, new Vector2(screenRectangle.Width / rangee * i, screenRectangle.Height / colones * j));
+                    obs[count] = new CityBlocks(tempTexture, new Vector2((screenRectangle.Width - tempTexture.Width) - i * (screenRectangle.Width - tempTexture.Width) / (rangee - 1), (screenRectangle.Height - tempTexture.Height) - j * (screenRectangle.Height - tempTexture.Height) / (colones- 1)));
 
                     count++;
                 }
             }
 
             StartGame();
+        }
+        private void Sort(List<Bloid> l)
+        {
+            foreach (Bloid bloid in l)
+            {
+                bloids[(int)bloid.getPosition().X / 100, (int)bloid.getPosition().Y / 100].Add(bloid);
+            }
         }
         private void StartGame()
         {
@@ -102,6 +128,43 @@ namespace BreakingOut
             // TODO: Unload any non ContentManager content here
         }
 
+
+
+
+        private List<Bloid>[] Neighbours(int x, int y)
+        {
+
+            int count = 0;
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    if (x + i >= 0 && y + j >= 0 && x + i < columbs && y + j < rows)
+                    {
+                        count++;
+                    }
+                }
+            }
+            List <Bloid>[] bloid = new List<Bloid>[count];
+            count = 0;
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    if (x + i >= 0 && y + j >= 0 && x + i < columbs && y + j < rows)
+                    {
+
+                        bloid[count] = bloids[i+x,j+y];
+                        count++;
+                        
+
+                    }
+                }
+            }
+            return bloid;
+
+        }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -109,34 +172,51 @@ namespace BreakingOut
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            alive = 0;
+
+
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-
-            foreach (Bloid bloid in bloids)
-            {
-                if (bloid.isAlive())
+            List<Bloid> temp = new List<Bloid>();
+            List<Bloid>[] tempT;
+            alive = 0;
+            for (int i = 0; i < columbs; i++)
+                for (int j = 0; j < rows; j++)
                 {
-                    bloid.updateAcceleration(bloids, obs);
-                    alive++;
+                    tempT = Neighbours(i, j);
+                    foreach (Bloid bloid in bloids[i, j])
+                        if(bloid.isAlive())
+                        {
+                            bloid.updateAcceleration(tempT, obs);
+                            alive++;
+                        }
                 }
 
-            }
-            foreach (Bloid bloid in bloids)
-            {
-                if (bloid.isAlive())
-                    bloid.updateSpeed(obs);
-            }
-            foreach (Bloid bloid in bloids)
-            {
-                if (bloid.isAlive())
-                    bloid.updatePosition();
-            }
-            foreach (Bloid bloid in bloids)
-            {
-                bloid.warpIfNecessairy();
-            }
+            for (int i = 0; i < columbs; i++)
+                for (int j = 0; j < rows; j++)
+                    foreach (Bloid bloid in bloids[i, j])
+                        bloid.updateMotion(obs);
+            List<Bloid> temp2 = new List<Bloid>();
+            for (int i = 0; i < columbs; i++)
+                for (int j = 0; j < rows; j++)
+                {
+                    temp = new List<Bloid>();
+                    foreach (Bloid bloid in bloids[i, j])
+                    {
+                        if (bloid.updatePosition(i * 100, j * 100))
+                        {
+                            temp.Add(bloid);
+                        }
+                    }
+                    foreach (Bloid b in temp)
+                    {
+                        bloids[i, j].Remove(b);
+                        temp2.Add(b);
+                    }
+
+                }
+            Sort(temp2);
+
             foreach (Obstacle o in obs)
             {
                 o.update();
@@ -158,10 +238,12 @@ namespace BreakingOut
             {
                 o.Draw(spriteBatch);
             }
-            foreach (Bloid bloid in bloids)
-            {
-                bloid.Draw(spriteBatch);
-            }
+            for (int i = 0; i < columbs; i++)
+                for (int j = 0; j < rows; j++)
+                    foreach (Bloid bloid in bloids[i, j])
+                        bloid.Draw(spriteBatch);
+
+
 
             spriteBatch.DrawString(font, gameTime.ElapsedGameTime + "", new Vector2(10, 10), Color.Red);
             spriteBatch.DrawString(font, alive + "", new Vector2(10, 30), Color.Red);
