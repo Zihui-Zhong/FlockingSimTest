@@ -107,13 +107,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ball.cs" />
     <Compile Include="Bloid.cs" />
-    <Compile Include="Brick.cs" />
     <Compile Include="CityBlocks.cs" />
     <Compile Include="ControlledCube.cs" />
     <Compile Include="Obstacle.cs" />
-    <Compile Include="Paddle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
@@ -123,9 +120,10 @@
     <Content Include="GameThumbnail.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BreakingOutContent\BreakingOutContent.contentproj">
-      <Name>BreakingOutContent</Name>
+    <ProjectReference Include="..\BreakingOutContent\FlockingSimContent.contentproj">
+      <Name>FlockingSimContent %28Content%29</Name>
       <XnaReferenceType>Content</XnaReferenceType>
+      <Project>{38701D47-DACF-41F6-A950-CB05676BF936}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

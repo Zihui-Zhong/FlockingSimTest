@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BreakingOut", "BreakingOut\BreakingOut\BreakingOut.csproj", "{25234908-6C04-4728-B4FB-06D1894B75D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlockingSim", "BreakingOut\BreakingOut\FlockingSim.csproj", "{25234908-6C04-4728-B4FB-06D1894B75D3}"
 EndProject
-Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "BreakingOutContent", "BreakingOut\BreakingOutContent\BreakingOutContent.contentproj", "{38701D47-DACF-41F6-A950-CB05676BF936}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlockingSimContent", "BreakingOut\BreakingOutContent\FlockingSimContent.contentproj", "{38701D47-DACF-41F6-A950-CB05676BF936}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
